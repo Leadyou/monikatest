@@ -22,7 +22,11 @@ export default function LoginPage({ onCheckEmail }) {
     setLoading(false)
 
     if (error) {
-      setError(error.message)
+      if (error.message.toLowerCase().includes('rate limit') || error.status === 429) {
+        setError('Przekroczono limit wysyłania e-maili. Odczekaj chwilę i spróbuj ponownie.')
+      } else {
+        setError(error.message)
+      }
     } else {
       onCheckEmail()
     }
