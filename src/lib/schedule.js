@@ -118,9 +118,18 @@ const OPEN_ENDED_HORIZON_DAYS = 45;
 
 // Rozpisuje cały harmonogram dzień po dniu, pogrupowany fazami — do wydruku
 // (odpowiednik ręcznie robionej tabeli w arkuszu, tylko generowany automatycznie).
+// Każda faza dostaje własną listę aktywnych leków (activeMeds) — w obrębie
+// jednej fazy zestaw aktywnych leków jest z definicji stały, więc każdy lek
+// z tej listy ma w każdym slocie jednoznaczny status: podano albo pominięto.
 export function buildPrintableSchedule(medications, rules, slotTimes, horizon) {
+  const medById = Object.fromEntries(medications.map((m) => [m.id, m]));
   const phases = computePhases(medications, rules, horizon.from, horizon.to);
   return phases.map((phase) => {
+    const activeMeds = phase.rules
+      .map((r) => medById[r.medicationId])
+      .filter(Boolean)
+      .sort((a, b) => a.order - b.order);
+
     const days = [];
     let cursor = phase.startDate;
     while (compareISODate(cursor, phase.endDate) <= 0) {
@@ -129,7 +138,7 @@ export function buildPrintableSchedule(medications, rules, slotTimes, horizon) {
       if (slots.length > 0) days.push({ date: cursor, slots });
       cursor = addDays(cursor, 1);
     }
-    return { ...phase, days };
+    return { ...phase, activeMeds, days };
   });
 }
 

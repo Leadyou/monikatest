@@ -399,30 +399,13 @@ input {
   margin: 0 0 14px;
 }
 
-.print-legend,
 .print-controls {
   font-size: 12px;
   margin-bottom: 10px;
 }
 
-.print-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-right: 14px;
-}
-
-.print-dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0.3);
-}
-
 .print-phase {
   margin-top: 16px;
-  break-inside: avoid;
 }
 
 .print-phase-header {
@@ -436,7 +419,7 @@ input {
 .print-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 11.5px;
+  font-size: 11px;
 }
 
 .print-table th,
@@ -444,30 +427,55 @@ input {
   border: 1px solid #999;
   padding: 4px 6px;
   text-align: left;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .print-table th {
   background: #f5f5f5;
+  text-align: center;
+  font-size: 10.5px;
+}
+
+.print-legend-row {
+  text-align: center;
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #555;
+  background: #fff !important;
 }
 
 .print-date-cell {
   white-space: nowrap;
   font-weight: 700;
+  vertical-align: top;
 }
 
 .print-time-cell {
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+  vertical-align: top;
+}
+
+.print-dose-cell {
+  text-align: center;
+  width: 44px;
+}
+
+.print-checkbox {
+  width: 13px;
+  height: 13px;
+  accent-color: #000;
+}
+
+.print-x {
+  font-weight: 700;
+  color: #333;
 }
 
 .print-sign-cell {
   width: 60px;
-}
-
-.print-skip {
-  color: #666;
-  font-style: italic;
+  vertical-align: top;
 }
 
 .print-footnote {

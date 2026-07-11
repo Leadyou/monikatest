@@ -26,19 +26,6 @@ export default function PrintSchedule() {
         </p>
       )}
 
-      <div className="print-legend">
-        <strong>Kolor nakrętki:</strong>{" "}
-        {data.medications
-          .slice()
-          .sort((a, b) => a.order - b.order)
-          .map((m) => (
-            <span key={m.id} className="print-legend-item">
-              <span className="print-dot" style={{ background: CAP_COLORS[m.capColor] }} />
-              {m.name}
-            </span>
-          ))}
-      </div>
-
       {data.controls.length > 0 && (
         <div className="print-controls">
           {data.controls.map((c) => (
@@ -59,37 +46,59 @@ export default function PrintSchedule() {
           <table className="print-table">
             <thead>
               <tr>
-                <th>Data</th>
-                <th>Godz.</th>
-                <th>Leki do podania (kolejność, min. 5 min odstępu)</th>
-                <th>Podp.</th>
+                <th rowSpan={2}>Data</th>
+                <th rowSpan={2}>Godz.</th>
+                <th rowSpan={2}>Leki do podania (kolejność, min. 5 min odstępu)</th>
+                <th colSpan={phase.activeMeds.length} className="print-legend-row">
+                  Kolor nakrętki
+                </th>
+                <th rowSpan={2}>Podp.</th>
+              </tr>
+              <tr>
+                {phase.activeMeds.map((med) => (
+                  <th key={med.id} style={{ background: CAP_COLORS[med.capColor] }}>
+                    {med.name}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {phase.days.map((day) =>
-                day.slots.map((slot, si) => (
-                  <tr key={`${day.date}-${slot.slotIndex}`}>
-                    {si === 0 && (
-                      <td rowSpan={day.slots.length} className="print-date-cell">
-                        {formatWeekdayShortPL(day.date)} {formatShortDatePL(day.date).slice(0, 5)}
-                      </td>
-                    )}
-                    <td className="print-time-cell">{slot.time}</td>
-                    <td>
-                      {slot.doses.map((d, di) => (
-                        <span key={d.medicationId}>
-                          {di > 0 && " → "}
-                          <span className="print-dot" style={{ background: CAP_COLORS[d.capColor] }} />
-                          {d.medicationName}
-                        </span>
-                      ))}
-                      {slot.skipped.length > 0 && (
-                        <span className="print-skip"> (pomija: {slot.skipped.join(", ")})</span>
+                day.slots.map((slot, si) => {
+                  const doseByMedId = Object.fromEntries(slot.doses.map((d) => [d.medicationId, d]));
+                  return (
+                    <tr key={`${day.date}-${slot.slotIndex}`}>
+                      {si === 0 && (
+                        <td rowSpan={day.slots.length} className="print-date-cell">
+                          {formatWeekdayShortPL(day.date)} {formatShortDatePL(day.date).slice(0, 5)}
+                        </td>
                       )}
-                    </td>
-                    <td className="print-sign-cell"></td>
-                  </tr>
-                ))
+                      <td className="print-time-cell">{slot.time}</td>
+                      <td>
+                        {slot.doses.map((d, di) => (
+                          <span key={d.medicationId}>
+                            {di > 0 && " → "}
+                            {d.medicationName}
+                          </span>
+                        ))}
+                      </td>
+                      {phase.activeMeds.map((med) => (
+                        <td
+                          key={med.id}
+                          className="print-dose-cell"
+                          style={{ background: CAP_COLORS[med.capColor] }}
+                        >
+                          {doseByMedId[med.id] ? (
+                            <input type="checkbox" className="print-checkbox" readOnly />
+                          ) : (
+                            <span className="print-x">x</span>
+                          )}
+                        </td>
+                      ))}
+                      <td className="print-sign-cell"></td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -97,8 +106,8 @@ export default function PrintSchedule() {
       ))}
 
       <p className="print-footnote">
-        Puste pole w kolumnie "Podp." = podaj lek i podpisz. Kolorowa kropka = kolor nakrętki butelki. Zachowaj min. 5
-        minut odstępu między kolejnymi kroplami.
+        Pusty kwadrat = podaj lek i zaznacz. „x” = tego leku nie podajemy o tej porze. Kolor komórki = kolor nakrętki
+        butelki. Podp. = podpis/inicjały osoby podającej. Zachowaj min. 5 minut odstępu między kolejnymi kroplami.
       </p>
     </div>
   );
