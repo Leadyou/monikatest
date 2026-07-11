@@ -4,6 +4,7 @@ import { useDoseReminders } from "./lib/reminders";
 import DzisPage from "./pages/DzisPage.jsx";
 import LekiPage from "./pages/LekiPage.jsx";
 import PrzebiegPage from "./pages/PrzebiegPage.jsx";
+import PrintSchedule from "./components/PrintSchedule.jsx";
 
 const TABS = [
   { key: "dzis", label: "Dziś" },
@@ -51,6 +52,8 @@ export default function App() {
         {tab === "leki" && <LekiPage />}
         {tab === "przebieg" && <PrzebiegPage />}
       </main>
+
+      <PrintSchedule />
     </div>
   );
 }

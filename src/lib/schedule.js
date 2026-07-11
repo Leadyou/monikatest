@@ -116,6 +116,23 @@ function buildPhase(startDate, endDate, rules, medById) {
 // medyczne, tylko granica do której z góry generujemy plan i powiadomienia.
 const OPEN_ENDED_HORIZON_DAYS = 45;
 
+// Rozpisuje cały harmonogram dzień po dniu, pogrupowany fazami — do wydruku
+// (odpowiednik ręcznie robionej tabeli w arkuszu, tylko generowany automatycznie).
+export function buildPrintableSchedule(medications, rules, slotTimes, horizon) {
+  const phases = computePhases(medications, rules, horizon.from, horizon.to);
+  return phases.map((phase) => {
+    const days = [];
+    let cursor = phase.startDate;
+    while (compareISODate(cursor, phase.endDate) <= 0) {
+      const plan = generateDayPlan(cursor, medications, rules, slotTimes);
+      const slots = plan.slots.filter((s) => s.doses.length > 0);
+      if (slots.length > 0) days.push({ date: cursor, slots });
+      cursor = addDays(cursor, 1);
+    }
+    return { ...phase, days };
+  });
+}
+
 export function scheduleHorizon(rules) {
   if (rules.length === 0) {
     const today = toISODate(new Date());

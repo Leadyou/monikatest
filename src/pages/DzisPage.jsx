@@ -4,6 +4,7 @@ import { seedData } from "../lib/seed";
 import { diffDays, formatLongDatePL, toISODate } from "../lib/dates";
 import { generateDayPlan } from "../lib/schedule";
 import { notificationPermission, notificationsSupported, requestNotificationPermission } from "../lib/reminders";
+import { CAP_COLORS } from "../lib/capColors";
 
 function useNow(intervalMs = 20000) {
   const [now, setNow] = useState(() => new Date());
@@ -28,8 +29,6 @@ function formatCountdown(ms) {
   const m = totalMin % 60;
   return `za ${h} godz. ${m} min`;
 }
-
-const CAP_VAR = { tan: "var(--cap-tan)", pink: "var(--cap-pink)", grey: "var(--cap-grey)", blue: "var(--cap-blue)" };
 
 export default function DzisPage() {
   const { data, ready, applySeed, markDoseTaken, unmarkDose, getDoseTakenAt } = useAppData();
@@ -162,7 +161,7 @@ export default function DzisPage() {
               <span key={d.medicationId} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 {i > 0 && <span style={{ color: "var(--ink-faint)" }}>→</span>}
                 <span className="pill">
-                  <span className="dot" style={{ background: CAP_VAR[d.capColor] || "var(--border-soft)" }} />
+                  <span className="dot" style={{ background: CAP_COLORS[d.capColor] || "var(--border-soft)" }} />
                   {d.medicationName}
                 </span>
               </span>

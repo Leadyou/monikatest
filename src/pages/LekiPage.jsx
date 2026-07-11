@@ -2,10 +2,9 @@ import { useState } from "react";
 import { useAppData } from "../lib/store.jsx";
 import { formatShortDatePL } from "../lib/dates";
 import { ruleEndDate } from "../lib/schedule";
+import { CAP_COLORS as CAP_VAR, CAP_LABELS } from "../lib/capColors";
 
 const CAP_KEYS = ["tan", "pink", "grey", "blue"];
-const CAP_VAR = { tan: "var(--cap-tan)", pink: "var(--cap-pink)", grey: "var(--cap-grey)", blue: "var(--cap-blue)" };
-const CAP_LABELS = { tan: "Beżowa", pink: "Różowa", grey: "Szara / biała", blue: "Błękitna" };
 const END_TYPES = [
   { key: "manual", label: "Do końca opakowania (zamknę ręcznie później)" },
   { key: "days", label: "Po ustalonej liczbie dni" },

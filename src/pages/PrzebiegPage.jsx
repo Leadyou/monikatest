@@ -60,6 +60,10 @@ export default function PrzebiegPage() {
 
   return (
     <div>
+      <button className="btn full" style={{ marginBottom: 14 }} onClick={() => window.print()}>
+        Drukuj harmonogram (PDF)
+      </button>
+
       <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
         <Stat val={`${stats.done}/${stats.scheduled}`} lab="dawek" />
         <Stat val={stats.phaseLabel} lab="faza" />

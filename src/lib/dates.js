@@ -40,3 +40,9 @@ export function formatShortDatePL(iso) {
   const d = parseISODate(iso);
   return `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.${d.getFullYear()}`;
 }
+
+const WEEKDAYS_SHORT_PL = ["Nd", "Pn", "Wt", "Śr", "Cz", "Pt", "Sb"];
+
+export function formatWeekdayShortPL(iso) {
+  return WEEKDAYS_SHORT_PL[parseISODate(iso).getDay()];
+}
