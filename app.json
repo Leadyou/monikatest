@@ -11,6 +11,7 @@
     },
     "android": {
       "package": "pl.turlo.kroplepozacmie",
+      "kotlinVersion": "1.9.25",
       "adaptiveIcon": {
         "backgroundColor": "#2B6E68"
       },
