@@ -1,16 +1,36 @@
-# React + Vite
+# Krople po zaćmie
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplikacja (Expo / React Native, Android) do rozpisywania i przypominania o podawaniu kropli do oka po operacji zaćmy. Na podstawie zaleceń lekarza (np. "4x dziennie przez 7 dni") sama generuje codzienny plan godzinowy — nie trzeba już ręcznie rozpisywać faz leczenia w arkuszu.
 
-Currently, two official plugins are available:
+## Funkcje
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Dziś** — lista dawek na dziś z kolejnością podania, informacją o pomijanych o danej porze lekach, odhaczaniem i lokalnymi przypomnieniami (jak budzik).
+- **Leki** — dodawanie/edycja leków (nazwa, kolor nakrętki, kolejność podania) i etapów dawkowania (częstotliwość, start, koniec).
+- **Przebieg** — automatycznie wykryte fazy leczenia i statystyki podanych dawek.
 
-## React Compiler
+Dane trzymane są wyłącznie lokalnie na urządzeniu (bez konta, bez serwera).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Uruchomienie w trybie deweloperskim
 
-## Expanding the ESLint configuration
+```bash
+npm install
+npx expo start
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Zeskanuj kod QR aplikacją **Expo Go** na Androidzie (szybki podgląd; przypomnienia lokalne działają, ale najbardziej niezawodnie na zbudowanej aplikacji, patrz niżej).
+
+## Zbudowanie instalowalnego .apk
+
+Bez publikowania w Google Play, do zainstalowania bezpośrednio na telefonie:
+
+```bash
+npx eas login        # konto Expo (darmowe)
+npx eas build:configure
+npx eas build --platform android --profile preview
+```
+
+EAS zbuduje plik `.apk` w chmurze i poda link do pobrania — wystarczy otworzyć go na telefonie i zainstalować (włączając "instalację z nieznanych źródeł" dla przeglądarki/pliku).
+
+## Dane startowe
+
+Przy pierwszym uruchomieniu ekran "Dziś" pozwala wczytać przykładowe dane odtworzone z prawdziwego wypisu szpitalnego (Oftaquix, Lotemax, Yellox, Hyal-Drop 4S) — można je potem dowolnie edytować lub usunąć w zakładce "Leki".
