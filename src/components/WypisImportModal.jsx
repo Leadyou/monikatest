@@ -5,6 +5,7 @@ import { CAP_COLORS, CAP_LABELS } from "../lib/capColors";
 import { Modal, CapSwatches, FrequencySeg, EndTypeRadios } from "../pages/LekiPage.jsx";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const MAX_FILE_BYTES = 15 * 1024 * 1024; // 15 MB — większe skany potrafią zawiesić słabszy telefon
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -41,6 +42,13 @@ export default function WypisImportModal({ onClose }) {
     const file = e.target.files?.[0];
     if (!file) return;
     setError("");
+    if (file.size > MAX_FILE_BYTES) {
+      setError(
+        `Plik jest za duży (${(file.size / (1024 * 1024)).toFixed(1)} MB, limit to 15 MB) — na telefonie może zawiesić przeglądarkę. Zeskanuj dokument w niższej jakości albo zrób zwykłe zdjęcie zamiast wielostronicowego skanu.`
+      );
+      e.target.value = "";
+      return;
+    }
     setStep("loading");
     try {
       const pdfBase64 = await withTimeout(fileToBase64(file), 30_000, "Nie udało się odczytać pliku. Spróbuj ponownie.");
