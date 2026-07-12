@@ -85,14 +85,10 @@ export default function PrintSchedule() {
                       {phase.activeMeds.map((med) => (
                         <td
                           key={med.id}
-                          className="print-dose-cell"
-                          style={{ background: CAP_COLORS[med.capColor] }}
+                          className={`print-dose-cell${doseByMedId[med.id] ? "" : " print-skip-cell"}`}
+                          style={{ backgroundColor: CAP_COLORS[med.capColor] }}
                         >
-                          {doseByMedId[med.id] ? (
-                            <input type="checkbox" className="print-checkbox" readOnly />
-                          ) : (
-                            <span className="print-x">x</span>
-                          )}
+                          {doseByMedId[med.id] && <input type="checkbox" className="print-checkbox" readOnly />}
                         </td>
                       ))}
                       <td className="print-sign-cell"></td>

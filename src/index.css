@@ -460,9 +460,11 @@ input {
   vertical-align: top;
 }
 
-.print-dose-cell {
+.print-table .print-dose-cell {
   text-align: center;
   width: 44px;
+  padding: 0;
+  height: 22px;
 }
 
 .print-checkbox {
@@ -471,9 +473,11 @@ input {
   accent-color: #000;
 }
 
-.print-x {
-  font-weight: 700;
-  color: #333;
+/* Duży krzyżyk wypełniający całą kratkę — pomijamy ten lek o tej porze. */
+.print-skip-cell {
+  background-image:
+    linear-gradient(to top right, transparent calc(50% - 1.1px), #222 calc(50% - 1.1px), #222 calc(50% + 1.1px), transparent calc(50% + 1.1px)),
+    linear-gradient(to top left, transparent calc(50% - 1.1px), #222 calc(50% - 1.1px), #222 calc(50% + 1.1px), transparent calc(50% + 1.1px));
 }
 
 .print-sign-cell {
