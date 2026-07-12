@@ -20,7 +20,10 @@ const WYPIS_SCHEMA = {
     patient: {
       type: "object",
       properties: {
-        name: { anyOf: [{ type: "string" }, { type: "null" }], description: "Imię i nazwisko pacjenta, jeśli widoczne" },
+        name: {
+          anyOf: [{ type: "string" }, { type: "null" }],
+          description: "WYŁĄCZNIE imię pacjenta, bez nazwiska (dana wrażliwa — nazwisko nigdy nie ma się tu znaleźć)",
+        },
         surgeryDate: { anyOf: [{ type: "string" }, { type: "null" }], description: "Data zabiegu w formacie YYYY-MM-DD" },
         eye: { anyOf: [{ type: "string", enum: ["lewe", "prawe", "oba"] }, { type: "null" }] },
       },
@@ -66,23 +69,43 @@ const WYPIS_SCHEMA = {
         additionalProperties: false,
       },
     },
+    controls: {
+      type: "array",
+      description: "Zaplanowane wizyty/kontrole lekarskie wspomniane w wypisie (np. 'kontrola za tydzień', 'wizyta kontrolna po 2 tygodniach').",
+      items: {
+        type: "object",
+        properties: {
+          label: { type: "string", description: "Krótki opis wizyty, np. 'Kontrola po tygodniu'" },
+          datetime: {
+            type: "string",
+            description:
+              "Data i orientacyjna godzina wizyty w formacie ISO 8601 (np. 2026-07-19T09:00:00). Jeśli godzina nie jest podana, użyj 09:00. Licz datę względem daty zabiegu, jeśli podano ją opisowo (np. 'za tydzień').",
+          },
+          location: { anyOf: [{ type: "string" }, { type: "null" }], description: "Placówka/gabinet, jeśli podano" },
+        },
+        required: ["label", "datetime", "location"],
+        additionalProperties: false,
+      },
+    },
     notes: {
       type: "string",
       description: "Po polsku: niejasności, fragmenty nieczytelne, albo informacje wymagające ręcznej weryfikacji przez człowieka. Pusty string jeśli brak uwag.",
     },
   },
-  required: ["patient", "medications", "rules", "notes"],
+  required: ["patient", "medications", "rules", "controls", "notes"],
   additionalProperties: false,
 };
 
 const PROMPT = `Jesteś asystentem, który tłumaczy wypis ze szpitala po operacji zaćmy na strukturalny plan dawkowania kropli do oka.
 
 Z załączonego dokumentu PDF wyodrębnij:
-1. Dane pacjenta (imię i nazwisko, datę zabiegu, które oko) — jeśli czegoś brakuje, ustaw null.
+1. Dane pacjenta — TYLKO imię (nigdy nazwisko — to dana wrażliwa, ma pozostać poza systemem), datę zabiegu, które oko. Jeśli czegoś brakuje, ustaw null.
 2. Listę leków/kropli do podania.
 3. Dla każdego leku jedną lub więcej reguł dawkowania odpowiadających kolejnym fazom leczenia opisanym w dokumencie (np. "4x dziennie przez pierwszy tydzień, potem 3x dziennie przez kolejny tydzień" to DWIE reguły z różnymi startDate).
+4. Zaplanowane wizyty/kontrole lekarskie wspomniane w dokumencie (np. "kontrola za tydzień", "wizyta kontrolna po 2 tygodniach") — jako listę "controls".
 
 Zasady:
+- NIGDY nie wpisuj nazwiska pacjenta do pola "name" — tylko imię. Jeśli w dokumencie widać pełne imię i nazwisko, weź wyłącznie pierwszy człon (imię).
 - Jeśli lekarz napisał zalecenie w formie "malejącej" (np. 4x/dz -> 3x/dz -> 2x/dz -> 1x/dz co tydzień), rozpisz to na osobne reguły, każda z kolejną startDate.
 - Gdy nie podano jawnie liczby dni ani daty końcowej danej fazy, a jest to ostatnia faza — użyj endType='manual'.
 - Wszystkie daty licz względem daty zabiegu, jeśli podano ją explicite w dokumencie zamiast konkretnych dat kalendarzowych.

@@ -49,6 +49,7 @@ export default function WypisImportModal({ onClose }) {
         patient: result.patient || { name: "", surgeryDate: "", eye: "" },
         medications: (result.medications || []).map((m) => ({ ...m, removed: false })),
         rules: (result.rules || []).map((r) => ({ ...r, ...emptyEndFields(r), removed: false })),
+        controls: (result.controls || []).map((c) => ({ ...c, removed: false })),
         notes: result.notes || "",
       });
       setStep("review");
@@ -66,6 +67,10 @@ export default function WypisImportModal({ onClose }) {
     setDraft((d) => ({ ...d, rules: d.rules.map((r, i) => (i === index ? { ...r, ...patch } : r)) }));
   }
 
+  function updateControl(index, patch) {
+    setDraft((d) => ({ ...d, controls: d.controls.map((c, i) => (i === index ? { ...c, ...patch } : c)) }));
+  }
+
   function updatePatient(patch) {
     setDraft((d) => ({ ...d, patient: { ...d.patient, ...patch } }));
   }
@@ -81,6 +86,12 @@ export default function WypisImportModal({ onClose }) {
       if (!DATE_RE.test(r.startDate)) return setError(`Popraw datę rozpoczęcia dla reguły leku "${r.medicationKey}".`);
       if (r.endType === "days" && !(Number(r.endDays) > 0)) return setError("Podaj liczbę dni większą od zera dla każdej reguły z typem 'dni'.");
       if (r.endType === "date" && !DATE_RE.test(r.endDate)) return setError("Popraw datę zakończenia (RRRR-MM-DD) w regułach.");
+    }
+
+    for (const c of draft.controls) {
+      if (c.removed) continue;
+      if (!c.label.trim()) return setError("Podaj opis dla każdej wizyty kontrolnej (albo ją usuń).");
+      if (!c.datetime) return setError("Podaj datę i godzinę dla każdej wizyty kontrolnej (albo ją usuń).");
     }
 
     setStep("saving");
@@ -116,7 +127,7 @@ export default function WypisImportModal({ onClose }) {
             style={{ marginBottom: 8 }}
             value={draft.patient.name || ""}
             onChange={(e) => updatePatient({ name: e.target.value })}
-            placeholder="Imię i nazwisko"
+            placeholder="Imię"
           />
           <div style={{ display: "flex", gap: 8 }}>
             <input
@@ -189,6 +200,41 @@ export default function WypisImportModal({ onClose }) {
                 ))}
             </div>
           ))}
+
+          {draft.controls.length > 0 && (
+            <>
+              <p className="field-label" style={{ marginTop: 20 }}>Wizyty kontrolne</p>
+              {draft.controls.map((c, i) => (
+                <div key={i} className="card" style={{ opacity: c.removed ? 0.4 : 1 }}>
+                  <input
+                    className="text-input"
+                    style={{ marginBottom: 8 }}
+                    value={c.label}
+                    onChange={(e) => updateControl(i, { label: e.target.value })}
+                    placeholder="np. Kontrola po tygodniu"
+                  />
+                  <input
+                    className="text-input"
+                    style={{ marginBottom: 8 }}
+                    type="datetime-local"
+                    value={c.datetime ? c.datetime.slice(0, 16) : ""}
+                    onChange={(e) => updateControl(i, { datetime: e.target.value })}
+                  />
+                  <input
+                    className="text-input"
+                    value={c.location || ""}
+                    onChange={(e) => updateControl(i, { location: e.target.value })}
+                    placeholder="Placówka (opcjonalnie)"
+                  />
+                  <div style={{ marginTop: 10, textAlign: "right" }}>
+                    <button className="link-btn" style={{ color: "var(--ink-faint)" }} onClick={() => updateControl(i, { removed: !c.removed })}>
+                      {c.removed ? "Cofnij usunięcie" : "Usuń"}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
 
           {error && <p className="error-text" style={{ marginTop: 14 }}>{error}</p>}
           <button className="btn full" style={{ marginTop: 18 }} onClick={handleConfirm}>
