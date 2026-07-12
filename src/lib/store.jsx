@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { supabase } from "./supabaseClient";
+import { warsawLocalToUtcISOString } from "./dates";
 
 const EMPTY_STATE = {
   patient: null,
@@ -237,7 +238,7 @@ export function AppDataProvider({ children }) {
     const activeControls = (draft.controls || []).filter((c) => !c.removed && c.label.trim() && c.datetime);
     if (activeControls.length > 0) {
       await supabase.from("cd_controls").insert(
-        activeControls.map((c) => ({ label: c.label.trim(), at: c.datetime, location: c.location || null }))
+        activeControls.map((c) => ({ label: c.label.trim(), at: warsawLocalToUtcISOString(c.datetime), location: c.location || null }))
       );
     }
 
@@ -274,7 +275,7 @@ export function AppDataProvider({ children }) {
     );
 
     await supabase.from("cd_controls").insert(
-      seed.controls.map((c) => ({ label: c.label, at: c.datetime, location: c.location }))
+      seed.controls.map((c) => ({ label: c.label, at: warsawLocalToUtcISOString(c.datetime), location: c.location }))
     );
 
     await supabase.from("cd_patient").insert({

@@ -46,3 +46,39 @@ const WEEKDAYS_SHORT_PL = ["Nd", "Pn", "Wt", "Śr", "Cz", "Pt", "Sb"];
 export function formatWeekdayShortPL(iso) {
   return WEEKDAYS_SHORT_PL[parseISODate(iso).getDay()];
 }
+
+// Zamienia "naiwną" datę/godzinę (np. z wypisu, bez strefy czasowej) na poprawny
+// znacznik UTC, traktując ją jako czas ścienny w Warszawie — obsługuje przejścia
+// czasu letniego/zimowego, więc nie można tu użyć stałego przesunięcia +1/+2.
+export function warsawLocalToUtcISOString(naiveDateTimeStr) {
+  const [datePart, timePart = "00:00:00"] = naiveDateTimeStr.split("T");
+  const [year, month, day] = datePart.split("-").map(Number);
+  const [hour, minute, second = "0"] = timePart.split(":");
+  const targetUTCMs = Date.UTC(year, month - 1, day, Number(hour), Number(minute), Number(second));
+
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Europe/Warsaw",
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+
+  let guessMs = targetUTCMs;
+  for (let i = 0; i < 2; i++) {
+    const parts = Object.fromEntries(fmt.formatToParts(new Date(guessMs)).map((p) => [p.type, p.value]));
+    const guessAsWarsawWallClockUTC = Date.UTC(
+      Number(parts.year),
+      Number(parts.month) - 1,
+      Number(parts.day),
+      Number(parts.hour) === 24 ? 0 : Number(parts.hour),
+      Number(parts.minute),
+      Number(parts.second)
+    );
+    guessMs += targetUTCMs - guessAsWarsawWallClockUTC;
+  }
+  return new Date(guessMs).toISOString();
+}
