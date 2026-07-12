@@ -140,6 +140,7 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify(parsed), { headers: JSON_HEADERS });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Nieznany błąd.";
+    console.error("parse-wypis error:", err);
     return new Response(JSON.stringify({ error: message }), { status: 500, headers: JSON_HEADERS });
   }
 });
