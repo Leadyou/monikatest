@@ -24,7 +24,7 @@ function emptyEndFields(rule) {
 }
 
 export default function WypisImportModal({ onClose }) {
-  const { importWypis } = useAppData();
+  const { data, importWypis, deleteControl } = useAppData();
   const [step, setStep] = useState("upload"); // upload | loading | review | saving
   const [error, setError] = useState("");
   const [draft, setDraft] = useState(null);
@@ -201,9 +201,39 @@ export default function WypisImportModal({ onClose }) {
             </div>
           ))}
 
+          {data.controls.length > 0 && (
+            <>
+              <p className="field-label" style={{ marginTop: 20 }}>Obecne wizyty w aplikacji</p>
+              <p style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>
+                Import nie podmienia automatycznie starych wizyt — jeśli poniższa jest nieaktualna, usuń ją ręcznie.
+              </p>
+              {data.controls.map((c) => (
+                <div key={c.id} className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <div style={{ fontSize: 13.5, fontWeight: 600 }}>{c.label}</div>
+                    <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>
+                      {new Date(c.datetime).toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric" })} ·{" "}
+                      {new Date(c.datetime).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" })}
+                      {c.location ? ` · ${c.location}` : ""}
+                    </div>
+                  </div>
+                  <button
+                    className="link-btn"
+                    style={{ color: "var(--ink-faint)" }}
+                    onClick={() => {
+                      if (window.confirm(`Usunąć wizytę „${c.label}”?`)) deleteControl(c.id);
+                    }}
+                  >
+                    Usuń
+                  </button>
+                </div>
+              ))}
+            </>
+          )}
+
           {draft.controls.length > 0 && (
             <>
-              <p className="field-label" style={{ marginTop: 20 }}>Wizyty kontrolne</p>
+              <p className="field-label" style={{ marginTop: 20 }}>Nowe wizyty z wypisu</p>
               {draft.controls.map((c, i) => (
                 <div key={i} className="card" style={{ opacity: c.removed ? 0.4 : 1 }}>
                   <input
