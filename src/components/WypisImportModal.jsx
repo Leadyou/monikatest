@@ -39,7 +39,10 @@ export default function WypisImportModal({ onClose }) {
       const { data: result, error: fnError } = await supabase.functions.invoke("parse-wypis", {
         body: { pdfBase64 },
       });
-      if (fnError) throw fnError;
+      if (fnError) {
+        const body = await fnError.context?.json?.().catch(() => null);
+        throw new Error(body?.error || fnError.message);
+      }
       if (result?.error) throw new Error(result.error);
 
       setDraft({
