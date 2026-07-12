@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 
-export default function LoginScreen() {
+export default function LoginScreen({ onBack }) {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
@@ -24,6 +24,11 @@ export default function LoginScreen() {
     <div className="app-shell">
       <div className="page" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100%" }}>
         <div className="card" style={{ width: "100%", maxWidth: 360 }}>
+          {onBack && (
+            <button className="link-btn" style={{ marginBottom: 10 }} onClick={onBack}>
+              ← Wróć do kreatora
+            </button>
+          )}
           <h1 className="app-title" style={{ marginBottom: 4 }}>Krople po zaćmie</h1>
           <p style={{ fontSize: 13, color: "var(--ink-soft)", marginBottom: 16 }}>
             Zaloguj się, żeby zobaczyć swój harmonogram.

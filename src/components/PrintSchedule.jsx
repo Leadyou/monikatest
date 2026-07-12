@@ -4,16 +4,16 @@ import { formatShortDatePL, formatWeekdayShortPL } from "../lib/dates";
 import { buildPrintableSchedule, scheduleHorizon } from "../lib/schedule";
 import { CAP_COLORS } from "../lib/capColors";
 
-export default function PrintSchedule() {
-  const { data, ready } = useAppData();
-
+// Czysty widok wydruku — dostaje dane wprost, więc działa też w publicznym
+// kreatorze, gdzie harmonogram istnieje tylko lokalnie (bez konta i bazy).
+export function PrintScheduleView({ data }) {
   const phases = useMemo(() => {
-    if (!ready || data.rules.length === 0) return [];
+    if (data.rules.length === 0) return [];
     const horizon = scheduleHorizon(data.rules);
     return buildPrintableSchedule(data.medications, data.rules, data.slotTimes, horizon);
-  }, [ready, data.medications, data.rules, data.slotTimes]);
+  }, [data.medications, data.rules, data.slotTimes]);
 
-  if (!ready || phases.length === 0) return null;
+  if (phases.length === 0) return null;
 
   return (
     <div id="print-root">
@@ -114,4 +114,10 @@ export default function PrintSchedule() {
       </p>
     </div>
   );
+}
+
+export default function PrintSchedule() {
+  const { data, ready } = useAppData();
+  if (!ready) return null;
+  return <PrintScheduleView data={data} />;
 }
