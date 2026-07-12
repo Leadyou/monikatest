@@ -20,9 +20,9 @@ const WYPIS_SCHEMA = {
     patient: {
       type: "object",
       properties: {
-        name: { type: ["string", "null"], description: "Imię i nazwisko pacjenta, jeśli widoczne" },
-        surgeryDate: { type: ["string", "null"], description: "Data zabiegu w formacie YYYY-MM-DD" },
-        eye: { type: ["string", "null"], enum: ["lewe", "prawe", "oba", null] },
+        name: { anyOf: [{ type: "string" }, { type: "null" }], description: "Imię i nazwisko pacjenta, jeśli widoczne" },
+        surgeryDate: { anyOf: [{ type: "string" }, { type: "null" }], description: "Data zabiegu w formacie YYYY-MM-DD" },
+        eye: { anyOf: [{ type: "string", enum: ["lewe", "prawe", "oba"] }, { type: "null" }] },
       },
       required: ["name", "surgeryDate", "eye"],
       additionalProperties: false,
@@ -59,8 +59,8 @@ const WYPIS_SCHEMA = {
             description: "'days' = liczba dni od startDate, 'date' = konkretna data końcowa, 'manual' = bez określonego końca (np. 'do odwołania')",
             enum: ["days", "date", "manual"],
           },
-          endDays: { type: ["integer", "null"], description: "Wymagane gdy endType='days'" },
-          endDate: { type: ["string", "null"], description: "Wymagane gdy endType='date', format YYYY-MM-DD" },
+          endDays: { anyOf: [{ type: "integer" }, { type: "null" }], description: "Wymagane gdy endType='days'" },
+          endDate: { anyOf: [{ type: "string" }, { type: "null" }], description: "Wymagane gdy endType='date', format YYYY-MM-DD" },
         },
         required: ["medicationKey", "startDate", "frequencyPerDay", "endType", "endDays", "endDate"],
         additionalProperties: false,
