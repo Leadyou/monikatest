@@ -69,8 +69,13 @@ export default function DzisPage() {
 
   async function handleSeed() {
     setSeeding(true);
-    await applySeed(seedData());
-    setSeeding(false);
+    try {
+      await applySeed(seedData());
+    } catch (err) {
+      window.alert(err instanceof Error ? err.message : "Nie udało się wczytać danych.");
+    } finally {
+      setSeeding(false);
+    }
   }
 
   if (!ready) return null;
