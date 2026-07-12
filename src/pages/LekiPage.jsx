@@ -283,11 +283,7 @@ export default function LekiPage() {
 
   return (
     <div>
-      <button
-        className="btn full"
-        style={{ marginBottom: 10, background: "var(--green)" }}
-        onClick={() => setShowImport(true)}
-      >
+      <button className="btn full" style={{ marginBottom: 10 }} onClick={() => setShowImport(true)}>
         Wczytaj leki z wypisu (PDF)
       </button>
       <button className="btn ghost full" style={{ marginBottom: 14 }} onClick={() => setShowNew(true)}>
