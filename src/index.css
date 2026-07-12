@@ -376,6 +376,9 @@ input {
   #print-root,
   #print-root * {
     visibility: visible;
+    /* Bez tego przeglądarki domyślnie pomijają kolorowe tła przy druku. */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
   #print-root {
     display: block;
