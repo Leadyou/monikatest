@@ -93,7 +93,7 @@ export default function PrintSchedule() {
                             {given ? (
                               <input type="checkbox" className="print-checkbox" readOnly />
                             ) : (
-                              <span className="print-skip-mark">–</span>
+                              <span className="print-skip-mark">×</span>
                             )}
                           </td>
                         );
