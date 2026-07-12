@@ -283,11 +283,15 @@ export default function LekiPage() {
 
   return (
     <div>
-      <button className="btn full" style={{ marginBottom: 10 }} onClick={() => setShowNew(true)}>
-        + Dodaj lek
-      </button>
-      <button className="btn ghost full" style={{ marginBottom: 14 }} onClick={() => setShowImport(true)}>
+      <button
+        className="btn full"
+        style={{ marginBottom: 10, background: "var(--green)" }}
+        onClick={() => setShowImport(true)}
+      >
         Wczytaj leki z wypisu (PDF)
+      </button>
+      <button className="btn ghost full" style={{ marginBottom: 14 }} onClick={() => setShowNew(true)}>
+        + Dodaj lek ręcznie
       </button>
 
       {meds.length === 0 && <p className="empty-state">Brak leków. Dodaj pierwszy przyciskiem powyżej.</p>}
