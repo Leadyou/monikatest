@@ -13,10 +13,10 @@ const END_TYPES = [
 ];
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-export function Modal({ title, onClose, children }) {
+export function Modal({ title, onClose, children, wide = false }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
+      <div className={`modal-sheet${wide ? " wide" : ""}`} onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2 className="modal-title">{title}</h2>
           <button className="close-btn" onClick={onClose} aria-label="Zamknij">

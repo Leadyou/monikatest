@@ -123,67 +123,89 @@ export default function WypisImportModal({ onClose }) {
   }
 
   return (
-    <Modal title="Wczytaj leki z wypisu" onClose={onClose}>
+    <Modal title="Wczytaj leki z wypisu" onClose={onClose} wide>
       {step === "upload" && (
         <>
-          <p style={{ fontSize: 13, color: "var(--ink-soft)", marginBottom: 14 }}>
+          <p className="import-intro">
             Wgraj skan lub PDF wypisu ze szpitala. AI spróbuje odczytać leki i dawkowanie — na następnym ekranie
             będzie można wszystko sprawdzić i poprawić przed zapisaniem.
           </p>
-          <input type="file" accept="application/pdf" onChange={handleFile} />
-          {error && <p className="error-text" style={{ marginTop: 14 }}>{error}</p>}
+          <label className="import-file-label">
+            Wybierz plik PDF z wypisem
+            <input type="file" accept="application/pdf" onChange={handleFile} />
+          </label>
+          {error && <p className="error-text import-error" style={{ marginTop: 14 }}>{error}</p>}
         </>
       )}
 
       {step === "loading" && (
-        <p style={{ fontSize: 14 }}>
-          Analizuję dokument… To może potrwać nawet minutę, zwłaszcza na sieci komórkowej. Nie zamykaj tego okna.
-        </p>
+        <div className="import-loading">
+          <div className="import-spinner" />
+          <p className="import-loading-text">
+            Analizuję dokument…
+            <br />
+            To może potrwać nawet minutę. Nie zamykaj tego okna.
+          </p>
+        </div>
       )}
 
       {step === "review" && draft && (
         <>
-          <p className="field-label">Dane pacjenta</p>
+          <p className="import-intro" style={{ marginBottom: 6 }}>
+            Sprawdź, czy wszystko się zgadza z wypisem. Każde pole można poprawić przed zapisaniem.
+          </p>
+
+          <h3 className="import-section">Dane pacjenta</h3>
+          <label className="import-label">Imię</label>
           <input
-            className="text-input"
-            style={{ marginBottom: 8 }}
+            className="text-input import-input"
             value={draft.patient.name || ""}
             onChange={(e) => updatePatient({ name: e.target.value })}
             placeholder="Imię"
           />
-          <div style={{ display: "flex", gap: 8 }}>
-            <input
-              className="text-input"
-              value={draft.patient.surgeryDate || ""}
-              onChange={(e) => updatePatient({ surgeryDate: e.target.value })}
-              placeholder="Data zabiegu RRRR-MM-DD"
-            />
-            <input
-              className="text-input"
-              value={draft.patient.eye || ""}
-              onChange={(e) => updatePatient({ eye: e.target.value })}
-              placeholder="lewe / prawe / oba"
-            />
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ flex: 1, minWidth: 180 }}>
+              <label className="import-label">Data zabiegu</label>
+              <input
+                className="text-input import-input"
+                value={draft.patient.surgeryDate || ""}
+                onChange={(e) => updatePatient({ surgeryDate: e.target.value })}
+                placeholder="RRRR-MM-DD"
+              />
+            </div>
+            <div style={{ flex: 1, minWidth: 180 }}>
+              <label className="import-label">Operowane oko</label>
+              <input
+                className="text-input import-input"
+                value={draft.patient.eye || ""}
+                onChange={(e) => updatePatient({ eye: e.target.value })}
+                placeholder="lewe / prawe / oba"
+              />
+            </div>
           </div>
 
           {draft.notes && (
-            <p style={{ fontSize: 12.5, color: "var(--amber)", marginTop: 12 }}>Uwaga AI: {draft.notes}</p>
+            <p style={{ fontSize: 15, lineHeight: 1.5, color: "var(--amber)", marginTop: 14 }}>
+              ⚠ Uwaga AI: {draft.notes}
+            </p>
           )}
 
-          <p className="field-label" style={{ marginTop: 20 }}>Leki</p>
+          <h3 className="import-section">Leki i dawkowanie</h3>
           {draft.medications.map((m) => (
-            <div key={m.key} className="card" style={{ opacity: m.removed ? 0.4 : 1 }}>
+            <div key={m.key} className="card" style={{ padding: "18px 18px 16px", opacity: m.removed ? 0.4 : 1 }}>
+              <label className="import-label" style={{ marginTop: 0 }}>Nazwa leku</label>
               <input
-                className="text-input"
-                style={{ marginBottom: 8 }}
+                className="text-input import-input"
+                style={{ marginBottom: 12 }}
                 value={m.name}
                 onChange={(e) => updateMed(m.key, { name: e.target.value })}
               />
+              <label className="import-label">Kolor nakrętki</label>
               <CapSwatches value={m.capColorGuess} onChange={(v) => updateMed(m.key, { capColorGuess: v })} />
               <div style={{ marginTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: 12, color: "var(--ink-faint)" }}>{CAP_LABELS[m.capColorGuess]}</span>
-                <button className="link-btn" style={{ color: "var(--ink-faint)" }} onClick={() => updateMed(m.key, { removed: !m.removed })}>
-                  {m.removed ? "Cofnij usunięcie" : "Usuń"}
+                <span style={{ fontSize: 14, color: "var(--ink-soft)" }}>{CAP_LABELS[m.capColorGuess]}</span>
+                <button className="link-btn" style={{ fontSize: 14, color: "var(--ink-faint)" }} onClick={() => updateMed(m.key, { removed: !m.removed })}>
+                  {m.removed ? "Cofnij usunięcie" : "Usuń lek"}
                 </button>
               </div>
 
@@ -191,29 +213,29 @@ export default function WypisImportModal({ onClose }) {
                 .map((r, i) => ({ ...r, _index: i }))
                 .filter((r) => r.medicationKey === m.key)
                 .map((r) => (
-                  <div key={r._index} className="card" style={{ background: "var(--surface-soft)", marginTop: 10, opacity: r.removed ? 0.4 : 1 }}>
+                  <div key={r._index} className="card" style={{ background: "var(--surface-soft)", padding: "16px", marginTop: 12, marginBottom: 0, opacity: r.removed ? 0.4 : 1 }}>
+                    <label className="import-label" style={{ marginTop: 0 }}>Ile razy dziennie</label>
                     <FrequencySeg value={r.frequencyPerDay} onChange={(v) => updateRule(r._index, { frequencyPerDay: v })} />
-                    <label className="field-label" style={{ marginTop: 12 }}>Data rozpoczęcia</label>
+                    <label className="import-label">Data rozpoczęcia</label>
                     <input
-                      className="text-input"
+                      className="text-input import-input"
                       value={r.startDate}
                       onChange={(e) => updateRule(r._index, { startDate: e.target.value })}
                       placeholder="RRRR-MM-DD"
                     />
-                    <div style={{ marginTop: 12 }}>
-                      <EndTypeRadios
-                        endType={r.endType}
-                        setEndType={(v) => updateRule(r._index, { endType: v })}
-                        endDays={r.endDays}
-                        setEndDays={(v) => updateRule(r._index, { endDays: v })}
-                        endDate={r.endDate}
-                        setEndDate={(v) => updateRule(r._index, { endDate: v })}
-                        allowEmptyManualDate
-                      />
-                    </div>
+                    <label className="import-label">Zakończenie</label>
+                    <EndTypeRadios
+                      endType={r.endType}
+                      setEndType={(v) => updateRule(r._index, { endType: v })}
+                      endDays={r.endDays}
+                      setEndDays={(v) => updateRule(r._index, { endDays: v })}
+                      endDate={r.endDate}
+                      setEndDate={(v) => updateRule(r._index, { endDate: v })}
+                      allowEmptyManualDate
+                    />
                     <button
                       className="link-btn"
-                      style={{ color: "var(--ink-faint)", marginTop: 10 }}
+                      style={{ fontSize: 14, color: "var(--ink-faint)", marginTop: 12 }}
                       onClick={() => updateRule(r._index, { removed: !r.removed })}
                     >
                       {r.removed ? "Cofnij usunięcie etapu" : "Usuń ten etap"}
@@ -225,15 +247,15 @@ export default function WypisImportModal({ onClose }) {
 
           {data.controls.length > 0 && (
             <>
-              <p className="field-label" style={{ marginTop: 20 }}>Obecne wizyty w aplikacji</p>
-              <p style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 8 }}>
-                Import nie podmienia automatycznie starych wizyt — jeśli poniższa jest nieaktualna, usuń ją ręcznie.
+              <h3 className="import-section">Obecne wizyty w aplikacji</h3>
+              <p className="import-section-hint">
+                Import nie podmienia automatycznie starych wizyt — jeśli któraś jest nieaktualna, usuń ją ręcznie.
               </p>
               {data.controls.map((c) => (
-                <div key={c.id} className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div key={c.id} className="card" style={{ padding: "16px 18px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
                   <div>
-                    <div style={{ fontSize: 13.5, fontWeight: 600 }}>{c.label}</div>
-                    <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>
+                    <div style={{ fontSize: 16, fontWeight: 700 }}>{c.label}</div>
+                    <div style={{ fontSize: 14.5, color: "var(--ink-soft)", marginTop: 2 }}>
                       {new Date(c.datetime).toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric" })} ·{" "}
                       {new Date(c.datetime).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" })}
                       {c.location ? ` · ${c.location}` : ""}
@@ -241,7 +263,7 @@ export default function WypisImportModal({ onClose }) {
                   </div>
                   <button
                     className="link-btn"
-                    style={{ color: "var(--ink-faint)" }}
+                    style={{ fontSize: 14, color: "var(--ink-faint)", flexShrink: 0 }}
                     onClick={() => {
                       if (window.confirm(`Usunąć wizytę „${c.label}”?`)) deleteControl(c.id);
                     }}
@@ -255,32 +277,33 @@ export default function WypisImportModal({ onClose }) {
 
           {draft.controls.length > 0 && (
             <>
-              <p className="field-label" style={{ marginTop: 20 }}>Nowe wizyty z wypisu</p>
+              <h3 className="import-section">Nowe wizyty z wypisu</h3>
               {draft.controls.map((c, i) => (
-                <div key={i} className="card" style={{ opacity: c.removed ? 0.4 : 1 }}>
+                <div key={i} className="card" style={{ padding: "18px 18px 16px", opacity: c.removed ? 0.4 : 1 }}>
+                  <label className="import-label" style={{ marginTop: 0 }}>Opis wizyty</label>
                   <input
-                    className="text-input"
-                    style={{ marginBottom: 8 }}
+                    className="text-input import-input"
                     value={c.label}
                     onChange={(e) => updateControl(i, { label: e.target.value })}
                     placeholder="np. Kontrola po tygodniu"
                   />
+                  <label className="import-label">Data i godzina</label>
                   <input
-                    className="text-input"
-                    style={{ marginBottom: 8 }}
+                    className="text-input import-input"
                     type="datetime-local"
                     value={c.datetime ? c.datetime.slice(0, 16) : ""}
                     onChange={(e) => updateControl(i, { datetime: e.target.value })}
                   />
+                  <label className="import-label">Placówka (opcjonalnie)</label>
                   <input
-                    className="text-input"
+                    className="text-input import-input"
                     value={c.location || ""}
                     onChange={(e) => updateControl(i, { location: e.target.value })}
-                    placeholder="Placówka (opcjonalnie)"
+                    placeholder="np. Poradnia okulistyczna"
                   />
-                  <div style={{ marginTop: 10, textAlign: "right" }}>
-                    <button className="link-btn" style={{ color: "var(--ink-faint)" }} onClick={() => updateControl(i, { removed: !c.removed })}>
-                      {c.removed ? "Cofnij usunięcie" : "Usuń"}
+                  <div style={{ marginTop: 12, textAlign: "right" }}>
+                    <button className="link-btn" style={{ fontSize: 14, color: "var(--ink-faint)" }} onClick={() => updateControl(i, { removed: !c.removed })}>
+                      {c.removed ? "Cofnij usunięcie" : "Usuń wizytę"}
                     </button>
                   </div>
                 </div>
@@ -288,14 +311,19 @@ export default function WypisImportModal({ onClose }) {
             </>
           )}
 
-          {error && <p className="error-text" style={{ marginTop: 14 }}>{error}</p>}
-          <button className="btn full" style={{ marginTop: 18 }} onClick={handleConfirm}>
+          {error && <p className="error-text import-error" style={{ marginTop: 14 }}>{error}</p>}
+          <button className="btn full" style={{ marginTop: 22, fontSize: 17, padding: "15px 16px" }} onClick={handleConfirm}>
             Zapisz do aplikacji
           </button>
         </>
       )}
 
-      {step === "saving" && <p style={{ fontSize: 14 }}>Zapisuję…</p>}
+      {step === "saving" && (
+        <div className="import-loading">
+          <div className="import-spinner" />
+          <p className="import-loading-text">Zapisuję…</p>
+        </div>
+      )}
     </Modal>
   );
 }
