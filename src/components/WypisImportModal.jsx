@@ -15,6 +15,14 @@ function fileToBase64(file) {
   });
 }
 
+function withTimeout(promise, ms, message) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(message)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
 function emptyEndFields(rule) {
   return {
     endType: rule.endType,
@@ -35,10 +43,12 @@ export default function WypisImportModal({ onClose }) {
     setError("");
     setStep("loading");
     try {
-      const pdfBase64 = await fileToBase64(file);
-      const { data: result, error: fnError } = await supabase.functions.invoke("parse-wypis", {
-        body: { pdfBase64 },
-      });
+      const pdfBase64 = await withTimeout(fileToBase64(file), 30_000, "Nie udało się odczytać pliku. Spróbuj ponownie.");
+      const { data: result, error: fnError } = await withTimeout(
+        supabase.functions.invoke("parse-wypis", { body: { pdfBase64 } }),
+        90_000,
+        "Połączenie trwało zbyt długo. Sprawdź internet (najlepiej Wi-Fi) i spróbuj ponownie."
+      );
       if (fnError) {
         const body = await fnError.context?.json?.().catch(() => null);
         throw new Error(body?.error || fnError.message);
@@ -117,7 +127,11 @@ export default function WypisImportModal({ onClose }) {
         </>
       )}
 
-      {step === "loading" && <p style={{ fontSize: 14 }}>Analizuję dokument…</p>}
+      {step === "loading" && (
+        <p style={{ fontSize: 14 }}>
+          Analizuję dokument… To może potrwać nawet minutę, zwłaszcza na sieci komórkowej. Nie zamykaj tego okna.
+        </p>
+      )}
 
       {step === "review" && draft && (
         <>
