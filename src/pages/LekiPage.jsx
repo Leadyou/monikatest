@@ -3,6 +3,7 @@ import { useAppData } from "../lib/store.jsx";
 import { formatShortDatePL } from "../lib/dates";
 import { ruleEndDate } from "../lib/schedule";
 import { CAP_COLORS as CAP_VAR, CAP_LABELS } from "../lib/capColors";
+import WypisImportModal from "../components/WypisImportModal.jsx";
 
 const CAP_KEYS = ["tan", "pink", "grey", "blue"];
 const END_TYPES = [
@@ -12,7 +13,7 @@ const END_TYPES = [
 ];
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-function Modal({ title, onClose, children }) {
+export function Modal({ title, onClose, children }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
@@ -28,7 +29,7 @@ function Modal({ title, onClose, children }) {
   );
 }
 
-function CapSwatches({ value, onChange }) {
+export function CapSwatches({ value, onChange }) {
   return (
     <div className="swatch-row">
       {CAP_KEYS.map((key) => (
@@ -45,7 +46,7 @@ function CapSwatches({ value, onChange }) {
   );
 }
 
-function FrequencySeg({ value, onChange }) {
+export function FrequencySeg({ value, onChange }) {
   return (
     <div className="seg">
       {[1, 2, 3, 4].map((n) => (
@@ -57,7 +58,7 @@ function FrequencySeg({ value, onChange }) {
   );
 }
 
-function EndTypeRadios({ endType, setEndType, endDays, setEndDays, endDate, setEndDate, allowEmptyManualDate }) {
+export function EndTypeRadios({ endType, setEndType, endDays, setEndDays, endDate, setEndDate, allowEmptyManualDate }) {
   return (
     <>
       <div className="radio-list">
@@ -275,14 +276,18 @@ function MedicationDetailModal({ medicationId, onClose }) {
 export default function LekiPage() {
   const { data, moveMedication } = useAppData();
   const [showNew, setShowNew] = useState(false);
+  const [showImport, setShowImport] = useState(false);
   const [selectedMedId, setSelectedMedId] = useState(null);
 
   const meds = data.medications.slice().sort((a, b) => a.order - b.order);
 
   return (
     <div>
-      <button className="btn full" style={{ marginBottom: 14 }} onClick={() => setShowNew(true)}>
+      <button className="btn full" style={{ marginBottom: 10 }} onClick={() => setShowNew(true)}>
         + Dodaj lek
+      </button>
+      <button className="btn ghost full" style={{ marginBottom: 14 }} onClick={() => setShowImport(true)}>
+        Wczytaj leki z wypisu (PDF)
       </button>
 
       {meds.length === 0 && <p className="empty-state">Brak leków. Dodaj pierwszy przyciskiem powyżej.</p>}
@@ -329,6 +334,7 @@ export default function LekiPage() {
       })}
 
       {showNew && <NewMedicationModal onClose={() => setShowNew(false)} />}
+      {showImport && <WypisImportModal onClose={() => setShowImport(false)} />}
       {selectedMedId && <MedicationDetailModal medicationId={selectedMedId} onClose={() => setSelectedMedId(null)} />}
     </div>
   );

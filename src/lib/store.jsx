@@ -201,6 +201,56 @@ export function AppDataProvider({ children }) {
     await fetchAll();
   }, [fetchAll]);
 
+  const importWypis = useCallback(async (draft) => {
+    const activeMeds = draft.medications.filter((m) => !m.removed && m.name.trim());
+    const baseOrder = data.medications.length;
+
+    const { data: insertedMeds } = await supabase
+      .from("cd_medications")
+      .insert(activeMeds.map((m, i) => ({ name: m.name.trim(), cap_color: m.capColorGuess, sort_order: baseOrder + i + 1 })))
+      .select();
+
+    const idByKey = {};
+    activeMeds.forEach((m, i) => {
+      idByKey[m.key] = insertedMeds[i].id;
+    });
+
+    const activeRules = draft.rules.filter((r) => !r.removed && idByKey[r.medicationKey]);
+    if (activeRules.length > 0) {
+      await supabase.from("cd_dosage_rules").insert(
+        activeRules.map((r) =>
+          ruleToRow({
+            medicationId: idByKey[r.medicationKey],
+            startDate: r.startDate,
+            frequencyPerDay: r.frequencyPerDay,
+            end:
+              r.endType === "days"
+                ? { type: "days", days: Number(r.endDays) }
+                : r.endType === "date"
+                  ? { type: "date", date: r.endDate }
+                  : { type: "manual", endDate: r.endDate || null },
+          })
+        )
+      );
+    }
+
+    const p = draft.patient;
+    if (p.name || p.surgeryDate || p.eye) {
+      const merged = {
+        name: p.name || data.patient?.name || "",
+        surgeryDate: p.surgeryDate || data.patient?.surgeryDate || "",
+        eye: p.eye || data.patient?.eye || "",
+      };
+      if (data.patient?.id) {
+        await supabase.from("cd_patient").update({ name: merged.name, surgery_date: merged.surgeryDate, eye: merged.eye }).eq("id", data.patient.id);
+      } else {
+        await supabase.from("cd_patient").insert({ name: merged.name, surgery_date: merged.surgeryDate, eye: merged.eye });
+      }
+    }
+
+    await fetchAll();
+  }, [data.medications, data.patient, fetchAll]);
+
   const applySeed = useCallback(async (seed) => {
     const { data: insertedMeds } = await supabase
       .from("cd_medications")
@@ -234,6 +284,7 @@ export function AppDataProvider({ children }) {
       data,
       ready,
       applySeed,
+      importWypis,
       setPatient,
       addMedication,
       updateMedication,
@@ -252,6 +303,7 @@ export function AppDataProvider({ children }) {
       data,
       ready,
       applySeed,
+      importWypis,
       setPatient,
       addMedication,
       updateMedication,
