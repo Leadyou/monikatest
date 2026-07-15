@@ -47,10 +47,31 @@ export async function parseWypisPdf(file) {
   return result;
 }
 
+// Znane krople i faktyczne kolory ich nakrętek — pewniejsze niż zgadywanie
+// przez AI, więc nadpisują jego propozycję. Dopasowanie po fragmencie nazwy,
+// żeby złapać warianty zapisu (np. "Hyal-Drop Ultra 4S", "Hyal Drop 4S").
+const KNOWN_CAP_COLORS = [
+  { match: "oftaquix", color: "tan" },
+  { match: "lotemax", color: "pink" },
+  { match: "yellox", color: "grey" },
+  { match: "hyal-drop", color: "blue" },
+  { match: "hyal drop", color: "blue" },
+];
+
+function knownCapColor(name) {
+  const normalized = (name || "").toLowerCase();
+  const hit = KNOWN_CAP_COLORS.find((k) => normalized.includes(k.match));
+  return hit ? hit.color : null;
+}
+
 export function draftFromResult(result) {
   return {
     patient: result.patient || { name: "", surgeryDate: "", eye: "" },
-    medications: (result.medications || []).map((m) => ({ ...m, removed: false })),
+    medications: (result.medications || []).map((m) => ({
+      ...m,
+      capColorGuess: knownCapColor(m.name) || m.capColorGuess || "grey",
+      removed: false,
+    })),
     rules: (result.rules || []).map((r) => ({
       ...r,
       endDays: r.endDays != null ? String(r.endDays) : "",
