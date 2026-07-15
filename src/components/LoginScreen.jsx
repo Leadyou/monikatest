@@ -23,18 +23,18 @@ export default function LoginScreen({ onBack }) {
   return (
     <div className="app-shell">
       <div className="page" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100%" }}>
-        <div className="card" style={{ width: "100%", maxWidth: 360 }}>
+        <div className="card" style={{ width: "100%", maxWidth: 430, padding: "22px 22px 26px" }}>
           {onBack && (
-            <button className="link-btn" style={{ marginBottom: 10 }} onClick={onBack}>
-              ← Wróć do kreatora
+            <button className="link-btn" style={{ marginBottom: 12 }} onClick={onBack}>
+              ← Wróć
             </button>
           )}
           <h1 className="app-title" style={{ marginBottom: 4 }}>Krople po zaćmie</h1>
-          <p style={{ fontSize: 13, color: "var(--ink-soft)", marginBottom: 16 }}>
-            Zaloguj się, żeby zobaczyć swój harmonogram.
+          <p style={{ fontSize: 16.5, color: "var(--ink-soft)", marginBottom: 18, lineHeight: 1.5 }}>
+            Podaj swój adres e-mail — wyślemy Ci link, którym zalogujesz się bez hasła.
           </p>
           {sent ? (
-            <p style={{ fontSize: 14 }}>
+            <p style={{ fontSize: 17, lineHeight: 1.55 }}>
               Wysłaliśmy link logowania na adres <strong>{email}</strong>. Sprawdź skrzynkę (także folder spam) i
               kliknij link, żeby się zalogować.
             </p>
