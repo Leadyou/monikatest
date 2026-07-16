@@ -54,7 +54,7 @@ export default function App() {
       </nav>
 
       <main className="page">
-        {tab === "dzis" && <DzisPage />}
+        {tab === "dzis" && <DzisPage onGoToLeki={() => setTab("leki")} />}
         {tab === "leki" && <LekiPage />}
         {tab === "przebieg" && <PrzebiegPage />}
       </main>

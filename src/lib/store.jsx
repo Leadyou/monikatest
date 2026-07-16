@@ -259,39 +259,10 @@ export function AppDataProvider({ children }) {
     await fetchAll();
   }, [data.medications, data.patient, fetchAll]);
 
-  const applySeed = useCallback(async (seed) => {
-    const { data: insertedMeds } = await supabase
-      .from("cd_medications")
-      .insert(seed.medications.map((m) => ({ name: m.name, cap_color: m.capColor, sort_order: m.order })))
-      .select();
-
-    const idByKey = {};
-    seed.medications.forEach((m, i) => {
-      idByKey[m.key] = insertedMeds[i].id;
-    });
-
-    await supabase.from("cd_dosage_rules").insert(
-      seed.rules.map((r) => ruleToRow({ ...r, medicationId: idByKey[r.medicationKey] }))
-    );
-
-    await supabase.from("cd_controls").insert(
-      seed.controls.map((c) => ({ label: c.label, at: warsawLocalToUtcISOString(c.datetime), location: c.location }))
-    );
-
-    await supabase.from("cd_patient").insert({
-      name: seed.patient.name,
-      surgery_date: seed.patient.surgeryDate,
-      eye: seed.patient.eye,
-    });
-
-    await fetchAll();
-  }, [fetchAll]);
-
   const value = useMemo(
     () => ({
       data,
       ready,
-      applySeed,
       importWypis,
       setPatient,
       addMedication,
@@ -310,7 +281,6 @@ export function AppDataProvider({ children }) {
     [
       data,
       ready,
-      applySeed,
       importWypis,
       setPatient,
       addMedication,

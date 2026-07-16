@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAppData } from "../lib/store.jsx";
-import { seedData } from "../lib/seed";
 import { diffDays, formatLongDatePL, toISODate } from "../lib/dates";
 import { generateDayPlan } from "../lib/schedule";
 import { notificationPermission, notificationsSupported, requestNotificationPermission } from "../lib/reminders";
@@ -30,12 +29,11 @@ function formatCountdown(ms) {
   return `za ${h} godz. ${m} min`;
 }
 
-export default function DzisPage() {
-  const { data, ready, applySeed, markDoseTaken, unmarkDose, getDoseTakenAt } = useAppData();
+export default function DzisPage({ onGoToLeki }) {
+  const { data, ready, markDoseTaken, unmarkDose, getDoseTakenAt } = useAppData();
   const now = useNow();
   const today = toISODate(now);
   const [permission, setPermission] = useState(notificationPermission());
-  const [seeding, setSeeding] = useState(false);
 
   const plan = useMemo(() => {
     if (!ready || data.medications.length === 0) return null;
@@ -67,28 +65,17 @@ export default function DzisPage() {
     setPermission(result);
   }
 
-  async function handleSeed() {
-    setSeeding(true);
-    try {
-      await applySeed(seedData());
-    } catch (err) {
-      window.alert(err instanceof Error ? err.message : "Nie udało się wczytać danych.");
-    } finally {
-      setSeeding(false);
-    }
-  }
-
   if (!ready) return null;
 
   if (data.medications.length === 0) {
     return (
       <div className="empty-state">
         <p>
-          Nie masz jeszcze dodanych leków. Możesz wczytać przykładowe dane z wypisu (Przykładowy pacjent) albo dodać leki
-          ręcznie w zakładce „Leki”.
+          Nie masz jeszcze dodanych leków. Przejdź do zakładki „Leki” i wgraj swój wypis ze szpitala (PDF) — odczytamy
+          z niego zalecenia. Leki można też dodać ręcznie.
         </p>
-        <button className="btn" onClick={handleSeed} disabled={seeding}>
-          {seeding ? "Wczytuję…" : "Wczytaj dane z wypisu"}
+        <button className="btn" onClick={onGoToLeki}>
+          Przejdź do zakładki „Leki”
         </button>
       </div>
     );
