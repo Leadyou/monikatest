@@ -62,9 +62,11 @@ export default function LoginScreen({ onBack }) {
     e.preventDefault();
     setError("");
     setInfo("");
+    // Długość kodu zależy od ustawień projektu Supabase (6–10 cyfr),
+    // więc nie zakładamy konkretnej liczby — sprawdzamy tylko minimum.
     const token = code.replace(/\D/g, "");
-    if (token.length !== 6) {
-      setError("Kod ma 6 cyfr — sprawdź, czy wpisane są wszystkie.");
+    if (token.length < 6) {
+      setError("Kod jest za krótki — sprawdź, czy przepisane są wszystkie cyfry z e-maila.");
       return;
     }
     setBusy(true);
@@ -93,7 +95,7 @@ export default function LoginScreen({ onBack }) {
           {step === "email" && (
             <>
               <p style={{ fontSize: 16.5, color: "var(--ink-soft)", marginBottom: 18, lineHeight: 1.5 }}>
-                Podaj swój adres e-mail — wyślemy Ci 6-cyfrowy kod, którym zalogujesz się bez hasła.
+                Podaj swój adres e-mail — wyślemy Ci kod, którym zalogujesz się bez hasła.
               </p>
               <form onSubmit={handleSendEmail}>
                 <label className="field-label">Adres e-mail</label>
@@ -116,7 +118,7 @@ export default function LoginScreen({ onBack }) {
           {step === "code" && (
             <>
               <p style={{ fontSize: 16.5, color: "var(--ink-soft)", marginBottom: 18, lineHeight: 1.55 }}>
-                Wysłaliśmy 6-cyfrowy kod na adres <strong>{email}</strong>. Kod jest w tytule wiadomości — przepisz go
+                Wysłaliśmy kod na adres <strong>{email}</strong>. Kod jest w tytule wiadomości — przepisz go
                 poniżej. Masz na to godzinę, nie musisz się spieszyć.
               </p>
               <form onSubmit={handleVerify}>
@@ -126,11 +128,11 @@ export default function LoginScreen({ onBack }) {
                   type="text"
                   inputMode="numeric"
                   autoComplete="one-time-code"
-                  maxLength={7}
+                  maxLength={13}
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  placeholder="000000"
-                  style={{ fontSize: 30, letterSpacing: 8, textAlign: "center", fontVariantNumeric: "tabular-nums" }}
+                  placeholder="np. 12345678"
+                  style={{ fontSize: 28, letterSpacing: 5, textAlign: "center", fontVariantNumeric: "tabular-nums" }}
                 />
                 {error && <p className="error-text" style={{ marginTop: 10 }}>{error}</p>}
                 {info && <p style={{ fontSize: 15, color: "var(--green)", marginTop: 10 }}>{info}</p>}
