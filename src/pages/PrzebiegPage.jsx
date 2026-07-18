@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useAppData } from "../lib/store.jsx";
 import { diffDays, formatShortDatePL, toISODate } from "../lib/dates";
 import { computePhases, generateDayPlan, scheduleHorizon } from "../lib/schedule";
+import { printWithDatedFilename } from "../lib/print";
 
 function nextDay(iso) {
   const d = new Date(iso + "T00:00:00");
@@ -60,7 +61,7 @@ export default function PrzebiegPage() {
 
   return (
     <div>
-      <button className="btn full" style={{ marginBottom: 14 }} onClick={() => window.print()}>
+      <button className="btn full" style={{ marginBottom: 14 }} onClick={() => printWithDatedFilename()}>
         Drukuj harmonogram (PDF)
       </button>
 

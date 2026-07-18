@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { checkWypisFile, parseWypisPdf, draftFromResult, validateDraft, draftToData } from "../lib/wypis";
 import { computePhases, scheduleHorizon } from "../lib/schedule";
 import { formatShortDatePL } from "../lib/dates";
+import { printWithDatedFilename } from "../lib/print";
 import WypisReviewFields from "../components/WypisReviewFields.jsx";
 import { PrintScheduleView } from "../components/PrintSchedule.jsx";
 
@@ -161,7 +162,7 @@ export default function KreatorPage({ onLoginClick }) {
               </div>
             ))}
 
-            <button className="btn full" style={{ marginTop: 10, fontSize: 18, padding: "16px" }} onClick={() => window.print()}>
+            <button className="btn full" style={{ marginTop: 10, fontSize: 18, padding: "16px" }} onClick={() => printWithDatedFilename()}>
               Drukuj harmonogram (PDF)
             </button>
             <button className="btn ghost full" style={{ marginTop: 10 }} onClick={() => { setStep("review"); setError(""); }}>
