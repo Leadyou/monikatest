@@ -95,7 +95,7 @@ export default function LoginScreen({ onBack }) {
           {step === "email" && (
             <>
               <p style={{ fontSize: 16.5, color: "var(--ink-soft)", marginBottom: 18, lineHeight: 1.5 }}>
-                Podaj swój adres e-mail — wyślemy Ci kod, którym zalogujesz się bez hasła.
+                Podaj swój adres e-mail — wyślemy Ci 6-cyfrowy kod, którym zalogujesz się bez hasła.
               </p>
               <form onSubmit={handleSendEmail}>
                 <label className="field-label">Adres e-mail</label>
@@ -118,8 +118,8 @@ export default function LoginScreen({ onBack }) {
           {step === "code" && (
             <>
               <p style={{ fontSize: 16.5, color: "var(--ink-soft)", marginBottom: 18, lineHeight: 1.55 }}>
-                Wysłaliśmy kod na adres <strong>{email}</strong>. Kod jest w tytule wiadomości — przepisz go
-                poniżej. Masz na to godzinę, nie musisz się spieszyć.
+                Wysłaliśmy 6-cyfrowy kod na adres <strong>{email}</strong>. Kod jest w tytule wiadomości — przepisz
+                go poniżej. Masz na to godzinę, nie musisz się spieszyć.
               </p>
               <form onSubmit={handleVerify}>
                 <label className="field-label">Kod z e-maila</label>
@@ -131,8 +131,8 @@ export default function LoginScreen({ onBack }) {
                   maxLength={13}
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  placeholder="np. 12345678"
-                  style={{ fontSize: 28, letterSpacing: 5, textAlign: "center", fontVariantNumeric: "tabular-nums" }}
+                  placeholder="123456"
+                  style={{ fontSize: 30, letterSpacing: 8, textAlign: "center", fontVariantNumeric: "tabular-nums" }}
                 />
                 {error && <p className="error-text" style={{ marginTop: 10 }}>{error}</p>}
                 {info && <p style={{ fontSize: 15, color: "var(--green)", marginTop: 10 }}>{info}</p>}
