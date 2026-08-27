@@ -585,6 +585,13 @@ input {
   vertical-align: top;
 }
 
+/* Wyraźna czarna kreska nad pierwszym wierszem każdego dnia — oddziela go
+   od zapisów z poprzedniego dnia (na pierwszym wierszu tabeli pokrywa się
+   z obramowaniem nagłówka, więc nie przeszkadza). */
+.print-day-start > td {
+  border-top: 2px solid #000;
+}
+
 .print-time-cell {
   white-space: nowrap;
   font-variant-numeric: tabular-nums;

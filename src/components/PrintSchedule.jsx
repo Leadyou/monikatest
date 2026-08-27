@@ -67,7 +67,7 @@ export function PrintScheduleView({ data }) {
                 day.slots.map((slot, si) => {
                   const doseByMedId = Object.fromEntries(slot.doses.map((d) => [d.medicationId, d]));
                   return (
-                    <tr key={`${day.date}-${slot.slotIndex}`}>
+                    <tr key={`${day.date}-${slot.slotIndex}`} className={si === 0 ? "print-day-start" : undefined}>
                       {si === 0 && (
                         <td rowSpan={day.slots.length} className="print-date-cell">
                           {formatWeekdayShortPL(day.date)} {formatShortDatePL(day.date).slice(0, 5)}
